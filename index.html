@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pogo – Student Paper Sharing</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg-main: #05070f;
+  --card-bg: rgba(255,255,255,0.06);
+  --border-soft: rgba(255,255,255,0.12);
+  --text-main: #e5e7eb;
+  --text-muted: #9ca3af;
+  --accent: linear-gradient(135deg, #22d3ee, #8b5cf6);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: radial-gradient(circle at top, #11162a, #05070f 70%);
+  color: var(--text-main);
+}
+
+.hidden { display: none; }
+
+h1 {
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  background: var(--accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+h2 { font-weight: 600; }
+
+p {
+  font-size: 14px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+input, select {
+  width: 100%;
+  padding: 13px;
+  margin-top: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  background: rgba(255,255,255,0.05);
+  color: var(--text-main);
+}
+
+button {
+  width: 100%;
+  margin-top: 18px;
+  padding: 13px;
+  border-radius: 14px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.container {
+  max-width: 380px;
+  margin: 100px auto;
+  padding: 28px;
+  background: var(--card-bg);
+  border-radius: 20px;
+  border: 1px solid var(--border-soft);
+}
+
+.dashboard {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+.menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px;
+  margin-top: 30px;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-soft);
+  border-radius: 20px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.section {
+  background: var(--card-bg);
+  border: 1px solid var(--border-soft);
+  border-radius: 20px;
+  padding: 24px;
+  margin-top: 20px;
+}
+
+.paper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  margin-bottom: 12px;
+}
+
+.star {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.star.saved {
+  color: gold;
+}
+
+.topbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.back-btn {
+  background: none;
+  border: 1px solid var(--border-soft);
+  padding: 8px 14px;
+  border-radius: 12px;
+  color: var(--text-main);
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="container" id="login">
+  <h1>Pogo</h1>
+  <p>Deli in odkrij študentska učna gradiva</p>
+  <input type="password" id="password" placeholder="Password" />
+  <button onclick="login()">Prijava</button>
+  <p>Demo geslo: <strong>book42note</strong></p>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard hidden" id="dashboard">
+  <div class="topbar">
+    <button class="back-btn hidden" id="backBtn" onclick="goBack()">← Nazaj</button>
+  </div>
+
+  <div id="home">
+    <h1>Pogo</h1>
+
+    <div class="menu">
+      <div class="card" onclick="openPage('browse')">📚 Poišči</div>
+      <div class="card" onclick="openPage('upload')">⬆️ Naloži</div>
+      <div class="card" onclick="openPage('saved')">⭐ Shranjeno</div>
+      <div class="card" onclick="openPage('library')">📁 Knjižnica</div>
+      <div class="card" onclick="openPage('profile')">👤 Profil</div>
+      <div class="card" onclick="openPage('settings')">⚙️ Nastavitve</div>
+      <div class="card" onclick="logout()">🚪 Odjavi se</div>
+    </div>
+  </div>
+
+  <!-- BROWSE -->
+  <div class="section hidden page" id="browse">
+    <h2>Pošči gradiva</h2>
+
+    <select id="professor">
+      <option value="">Profesor</option>
+      <option>Andrej Novak</option>
+      <option>Irena Horvat</option>
+    </select>
+
+    <select id="class">
+      <option value="">Predmet</option>
+      <option>MAT</option>
+      <option>PIT</option>
+      <option>SLO</option>
+      <option>ANG</option>
+    </select>
+
+    <select id="year">
+      <option value="">Leto</option>
+      <option>2023</option>
+      <option>2024</option>
+      <option>2025</option>
+      <option>2026</option>
+      <option>2027</option>
+    </select>
+
+    <button onclick="searchPapers()">Išči</button>
+    <div id="results"></div>
+  </div>
+
+  <!-- SAVED -->
+  <div class="section hidden page" id="saved">
+    <h2>Shranjena gradiva</h2>
+    <div id="savedResults"></div>
+  </div>
+
+  <!-- OTHER DEMO SECTIONS -->
+  <div class="section hidden page" id="upload"><p>Nalaganje onemogočeno (demo)</p></div>
+  <div class="section hidden page" id="library"><p>Vaša gradiva bodo prikazana tukaj</p></div>
+  <div class="section hidden page" id="profile"><p>Uporabniški profil (demo)</p></div>
+  <div class="section hidden page" id="settings"><p>Nastavitve (demo)</p></div>
+</div>
+
+<script>
+const validPasswords = ['book42note'];
+
+const papers = [
+  { id: 1, professor: 'Irena Hrovat', class: 'SLO', year: '2023', title: 'Premi govor zapiski' },
+  { id: 2, professor: 'Irena Hrovat', class: 'SLO', year: '2024', title: 'Na klncu navodila za spis' },
+  { id: 3, professor: 'Andrej Novak', class: 'MAT', year: '2023', title: 'Polinomi Vaje' }
+];
+
+let saved = [];
+
+/* AUTH */
+function login() {
+  if (validPasswords.includes(password.value)) {
+    loginDiv().classList.add('hidden');
+    dashboardDiv().classList.remove('hidden');
+  } else alert('Invalid password');
+}
+
+function logout() {
+  dashboardDiv().classList.add('hidden');
+  loginDiv().classList.remove('hidden');
+}
+
+/* NAV */
+function openPage(id) {
+  home().classList.add('hidden');
+  pages().forEach(p => p.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  backBtn().classList.remove('hidden');
+  if (id === 'saved') renderSaved();
+}
+
+function goBack() {
+  pages().forEach(p => p.classList.add('hidden'));
+  home().classList.remove('hidden');
+  backBtn().classList.add('hidden');
+}
+
+/* PAPERS */
+function searchPapers() {
+  const prof = professor.value;
+  const cls = document.getElementById('class').value;
+  const yr = year.value;
+
+  const results = papers.filter(p =>
+    (!prof || p.professor === prof) &&
+    (!cls || p.class === cls) &&
+    (!yr || p.year === yr)
+  );
+
+  resultsDiv().innerHTML = results.length
+    ? results.map(renderPaper).join('')
+    : '<p>No papers found</p>';
+}
+
+function toggleSave(id) {
+  saved.includes(id)
+    ? saved = saved.filter(x => x !== id)
+    : saved.push(id);
+  searchPapers();
+  renderSaved();
+}
+
+function renderPaper(p) {
+  const isSaved = saved.includes(p.id);
+  return `
+    <div class="paper">
+      <div>
+        <strong>${p.title}</strong><br>
+        ${p.professor} • ${p.class} • ${p.year}
+      </div>
+      <div class="star ${isSaved ? 'saved' : ''}" onclick="toggleSave(${p.id})">
+        ${isSaved ? '★' : '☆'}
+      </div>
+    </div>`;
+}
+
+function renderSaved() {
+  const s = papers.filter(p => saved.includes(p.id));
+  savedResults().innerHTML = s.length
+    ? s.map(renderPaper).join('')
+    : '<p>Ni shranjenih gradiv</p>';
+}
+
+/* HELPERS */
+const loginDiv = () => document.getElementById('login');
+const dashboardDiv = () => document.getElementById('dashboard');
+const home = () => document.getElementById('home');
+const pages = () => document.querySelectorAll('.page');
+const resultsDiv = () => document.getElementById('results');
+const savedResults = () => document.getElementById('savedResults');
+const backBtn = () => document.getElementById('backBtn');
+</script>
+
+</body>
+</html>
